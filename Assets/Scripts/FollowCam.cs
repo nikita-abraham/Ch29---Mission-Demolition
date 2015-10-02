@@ -19,13 +19,25 @@ public class FollowCam : MonoBehaviour {
 		camZ = this.transform.position.z;
 	}
 
-	void Update(){
-		//if there's only one line following an if, it doesn't need braces
-		if (poi == null)
-			return; // return if there is no poi
-
-		// get the position of the poi
-		Vector3 destination = poi.transform.position;
+	void FixedUpdate(){
+		Vector3 destination;
+		//if there's no poi, return to P: 0,0,0
+		if (poi == null) {
+			destination = Vector3.zero;
+		} else {
+			//Get the position of the poi
+			destination = poi.transform.position;
+			//If poi is a Projectile, check to see if it's at rest
+			if (poi.tag == "Projectile") {
+				//If it is sleeping (that is, not moving)
+				if (poi.rigidbody.IsSleeping ()) {
+					//return to default view
+					poi = null;
+					// in the next update
+					return;
+				}
+			}
+		}
 		// limit the X & Y to minimum value
 		destination.x = Mathf.Max (minXY.x, destination.x);
 		destination.y = Mathf.Max (minXY.y, destination.y);
@@ -38,5 +50,4 @@ public class FollowCam : MonoBehaviour {
 		//Set the orthographicSize of the Camera to keep Ground in view
 		this.camera.orthographicSize = destination.y + 10;
 	}
-
 }
